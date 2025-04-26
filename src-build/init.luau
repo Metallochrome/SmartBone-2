@@ -33,7 +33,7 @@ export type IColliderTable = ColliderObjectClass.IColliderTable
 type ImOverlay = {
 	Begin: (Text: string, BackgroundColor: Color3?, TextColor: Color3?) -> (),
 	End: () -> (),
-	Text: (Text: string, BackgroundColor: Color3?, TextColor: Color3?) -> (),
+	Text: (Text: string, BackgroundColor: Color3?, TextColor: Color3?) -> ()
 }
 
 type bool = boolean
@@ -192,25 +192,25 @@ function Class:m_UpdateViewFrustum()
 	if shared.FrameCounter % Config.FRUSTUM_FREQ ~= 0 then
 		return
 	end
+	
 
-	debug.profilebegin("SmartBone2::m_UpdateViewFrustum")
-	local a, b, c, d, e, f, g, h, i = Frustum.GetCFrames(workspace.CurrentCamera, Config.FAR_PLANE) -- Hard coded stud limit on any object
+local a, b, c, d, e, f, g, h, i = Frustum.GetCFrames(workspace.CurrentCamera, Config.FAR_PLANE) -- Hard coded stud limit on any object
 
 	for _, BoneTree in self.BoneTrees do
-		debug.profilebegin("BoneTree::m_UpdateViewFrustum")
-		local FakeObject = {
+		
+local FakeObject = {
 			CFrame = BoneTree.BoundingBoxCFrame,
 			Size = BoneTree.BoundingBoxSize,
 		}
 		BoneTree.InView = Frustum.ObjectInFrustum(FakeObject, a, b, c, d, e, f, g, h, i)
-		debug.profileend()
-	end
-	debug.profileend()
+	
+end
+
 end
 
 function Class:m_CleanColliders()
-	debug.profilebegin("Clean Colliders")
-	local DidDestroy = false
+	
+local DidDestroy = false
 
 	if #self.ColliderObjects ~= 0 then -- Micro optimizations
 		for i, ColliderObject in self.ColliderObjects do
@@ -227,8 +227,8 @@ function Class:m_CleanColliders()
 	end
 
 	if not DidDestroy then -- Prevent warning because we left parallel
-		debug.profileend()
-	end
+	
+end
 end
 
 --- @private
@@ -241,9 +241,9 @@ end
 --- :::
 --- Updates the provided bone tree with all optimizations
 function Class:m_UpdateBoneTree(BoneTree: IBoneTree, Index: number, Delta: number)
-	debug.profilebegin("SmartBone2::m_UpdateBoneTree")
 
-	if BoneTree.Destroyed then
+	
+if BoneTree.Destroyed then
 		BoneTree:Destroy()
 		table.remove(self.BoneTrees, Index)
 
@@ -258,9 +258,9 @@ function Class:m_UpdateBoneTree(BoneTree: IBoneTree, Index: number, Delta: numbe
 		BoneTree:SkipUpdate()
 
 		if not AlreadySkipped then
-			debug.profileend()
 
-			task.synchronize()
+			
+task.synchronize()
 			BoneTree:ApplyTransform()
 
 			SB_VERBOSE_LOG(
@@ -270,14 +270,14 @@ function Class:m_UpdateBoneTree(BoneTree: IBoneTree, Index: number, Delta: numbe
 
 		return
 	end
+	
 
-	debug.profilebegin("Step Colliders")
-	for _, ColliderObject in self.ColliderObjects do
+for _, ColliderObject in self.ColliderObjects do
 		ColliderObject:Step()
 	end
-	debug.profileend()
 
-	local UpdateHz = 1 / BoneTree.UpdateRate
+	
+local UpdateHz = 1 / BoneTree.UpdateRate
 	local DidUpdate = false
 
 	BoneTree.AccumulatedDelta += Delta
@@ -290,9 +290,9 @@ function Class:m_UpdateBoneTree(BoneTree: IBoneTree, Index: number, Delta: numbe
 		BoneTree:Constrain(self.ColliderObjects, UpdateHz)
 		BoneTree:SolveTransform(UpdateHz)
 	end
-	debug.profileend()
 
-	if DidUpdate then
+	
+if DidUpdate then
 		task.synchronize()
 		BoneTree:ApplyTransform()
 	end
@@ -386,11 +386,11 @@ end
 --- @within SmartBone
 --- Resets all bone trees to their rest position
 function Class:SkipUpdate()
-	debug.profilebegin("SmartBone2::SkipUpdate")
-	for _, BoneTree in self.BoneTrees do
+	
+for _, BoneTree in self.BoneTrees do
 		BoneTree:SkipUpdate()
 	end
-	debug.profileend()
+
 end
 
 --- @within SmartBone
